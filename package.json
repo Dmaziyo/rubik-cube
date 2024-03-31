@@ -1,0 +1,23 @@
+{
+  "name": "rubik-cube-maziyo",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "tsc:watch": "tsc --watch",
+    "start": "concurrently --kill-others --names tsc,web-dev-server \"npm run tsc:watch\" \"web-dev-server --config web-dev-server.config.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "@types/three": "^0.163.0",
+    "@web/dev-server": "^0.4.3",
+    "concurrently": "^8.2.2",
+    "rimraf": "^5.0.5",
+    "typescript": "^5.4.3"
+  },
+  "dependencies": {
+    "three": "^0.163.0"
+  }
+}
