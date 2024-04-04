@@ -15,6 +15,7 @@ export const createCube = () => {
   for (let i = 0; i < colors.length; i++) {
     planes.push(createPlane(colors[i], squarePos))
   }
+  //TODO rotate plane to create a cube
 }
 
 const createPlane = (color: ColorRepresentation, squarePos: Vector2[]) => {
