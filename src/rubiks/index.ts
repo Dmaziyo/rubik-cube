@@ -2,6 +2,7 @@ import { PerspectiveCamera, Scene, WebGLRenderer } from 'three'
 import { createCamera } from './components/camera'
 import { createScene } from './components/scene'
 import { createRenderer } from './components/renderer'
+import { createCube } from './core/cube'
 
 const setSize = (container: Element, camera: PerspectiveCamera, renderer: WebGLRenderer) => {
   camera.aspect = container.clientWidth / container.clientHeight
@@ -18,17 +19,20 @@ export class Rubik {
   private renderer: WebGLRenderer
 
   public constructor(container: Element) {
+    // TODO control camera
     this.camera = createCamera()
-    this.scene = createScene('blue')
+    this.scene = createScene('black')
     this.renderer = createRenderer()
+    const cube = createCube()
+    this.scene.add(cube)
     container.append(this.renderer.domElement)
 
-    setSize(container, this.camera, this.renderer);
-
+    setSize(container, this.camera, this.renderer)
+    this.render()
     // TODO resizer
   }
 
-  public render(){
+  private render() {
     this.renderer.render(this.scene, this.camera)
   }
 }
