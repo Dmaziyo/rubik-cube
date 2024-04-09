@@ -3,6 +3,7 @@ import { createCamera } from './components/camera'
 import { createScene } from './components/scene'
 import { createRenderer } from './components/renderer'
 import { createCube } from './core/cube'
+import { Resizer } from './systems/Resizer'
 
 const setSize = (container: Element, camera: PerspectiveCamera, renderer: WebGLRenderer) => {
   camera.aspect = container.clientWidth / container.clientHeight
@@ -27,9 +28,9 @@ export class Rubik {
     this.scene.add(cube)
     container.append(this.renderer.domElement)
 
+    const resizer = new Resizer(container,this.camera,this.renderer) 
     setSize(container, this.camera, this.renderer)
     this.render()
-    // TODO resizer
   }
 
   private render() {
