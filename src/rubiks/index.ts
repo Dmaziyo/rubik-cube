@@ -5,6 +5,7 @@ import { createRenderer } from './components/renderer'
 import { createCube } from './core/cube'
 import { Resizer } from './systems/Resizer'
 import { Loop } from './systems/loop'
+import { createControls } from './systems/control'
 
 const setSize = (container: Element, camera: PerspectiveCamera, renderer: WebGLRenderer) => {
   camera.aspect = container.clientWidth / container.clientHeight
@@ -22,14 +23,17 @@ export class Rubik {
   private loop: Loop
 
   public constructor(container: Element) {
-    // TODO control camera
     this.camera = createCamera()
     this.scene = createScene('black')
     this.renderer = createRenderer()
     const cube = createCube()
     this.scene.add(cube)
 
+    // 实现动画效果以及摄像头控制
     this.loop = new Loop(this.camera, this.scene, this.renderer)
+    const controls = createControls(this.camera, this.renderer.domElement)
+    this.loop.updatables.push(controls)
+
     container.append(this.renderer.domElement)
 
     const resizer = new Resizer(container, this.camera, this.renderer)
