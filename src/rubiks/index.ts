@@ -4,6 +4,7 @@ import { createScene } from './components/scene'
 import { createRenderer } from './components/renderer'
 import { createCube } from './core/cube'
 import { Resizer } from './systems/Resizer'
+import { Loop } from './systems/loop'
 
 const setSize = (container: Element, camera: PerspectiveCamera, renderer: WebGLRenderer) => {
   camera.aspect = container.clientWidth / container.clientHeight
@@ -18,6 +19,7 @@ export class Rubik {
   private camera: PerspectiveCamera
   private scene: Scene
   private renderer: WebGLRenderer
+  private loop: Loop
 
   public constructor(container: Element) {
     // TODO control camera
@@ -26,14 +28,23 @@ export class Rubik {
     this.renderer = createRenderer()
     const cube = createCube()
     this.scene.add(cube)
+
+    this.loop = new Loop(this.camera, this.scene, this.renderer)
     container.append(this.renderer.domElement)
 
-    const resizer = new Resizer(container,this.camera,this.renderer) 
+    const resizer = new Resizer(container, this.camera, this.renderer)
     setSize(container, this.camera, this.renderer)
-    this.render()
+    this.start()
   }
 
-  private render() {
+  public render() {
     this.renderer.render(this.scene, this.camera)
+  }
+
+  public start() {
+    this.loop.start()
+  }
+  public stop() {
+    this.loop.stop()
   }
 }
