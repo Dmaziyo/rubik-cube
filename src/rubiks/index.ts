@@ -2,10 +2,10 @@ import { PerspectiveCamera, Scene, WebGLRenderer } from 'three'
 import { createCamera } from './components/camera'
 import { createScene } from './components/scene'
 import { createRenderer } from './components/renderer'
-import { createCube } from './core/cube'
 import { Resizer } from './systems/Resizer'
 import { Loop } from './systems/loop'
 import { createControls } from './systems/control'
+import { Cube } from './core/cube'
 
 const setSize = (container: Element, camera: PerspectiveCamera, renderer: WebGLRenderer) => {
   camera.aspect = container.clientWidth / container.clientHeight
@@ -26,7 +26,7 @@ export class Rubik {
     this.camera = createCamera()
     this.scene = createScene('black')
     this.renderer = createRenderer()
-    const cube = createCube()
+    const cube = new Cube(3)
     this.scene.add(cube)
 
     // 实现动画效果以及摄像头控制

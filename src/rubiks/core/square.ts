@@ -1,7 +1,9 @@
-import { ColorRepresentation, Mesh, MeshBasicMaterial, Shape, ShapeGeometry, Vector2 } from 'three'
+import { ColorRepresentation, Mesh, MeshBasicMaterial, Shape, ShapeGeometry, Vector2, Vector3 } from 'three'
+import { CubeElement } from './cubeData'
 
 // 画一个小方块
-export const createSquare = (color: ColorRepresentation) => {
+export const createSquare = (color: ColorRepresentation, cubeElement: CubeElement) => {
+  const scale=new Vector3(0.9,0.9,0.9)
   const squareShape = new Shape()
   const x = 0,
     y = 0
@@ -24,8 +26,13 @@ export const createSquare = (color: ColorRepresentation) => {
   squareShape.bezierCurveTo(x - 0.5, y + 0.5, x - 0.5, y + 0.5, x - 0.4, y + 0.5)
 
   const geometry = new ShapeGeometry(squareShape)
-  const material = new MeshBasicMaterial({ color })
+  const material = new MeshBasicMaterial({ color: cubeElement.color })
   const mesh = new SquareMesh(geometry, material)
+  mesh.scale.copy(scale)
+
+  // 将方块移动到正确的位置
+  mesh.position.copy(cubeElement.pos)
+  mesh.lookAt(mesh.position.clone().add(cubeElement.direction))
   return mesh
 }
 
