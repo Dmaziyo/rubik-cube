@@ -41,7 +41,7 @@ export class Control {
     const intersects = this.raycaster.intersectObjects(this.scene.children)
 
     if (intersects.length > 0) {
-      intersects.sort((a, b) => a.distance - b.distance)
+      // Intersections are returned sorted by distance, closest first.
       ;(intersects[0].object as SquareMesh).material.color.set(Math.random() * 0xff0000)
       this.renderer.render(this.scene, this.camera)
     }
