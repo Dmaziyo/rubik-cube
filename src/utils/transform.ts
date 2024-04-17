@@ -1,4 +1,4 @@
-import { Matrix4, Object3D, Vector3 } from 'three'
+import { Matrix4, Object3D, Vector2, Vector3 } from 'three'
 
 export function rotateAroundWorldAxis(object: Object3D, axis: Vector3, radians: number) {
   const mat = new Matrix4()
@@ -9,4 +9,8 @@ export function rotateAroundWorldAxis(object: Object3D, axis: Vector3, radians: 
 
   //   让物体旋转
   object.rotation.setFromRotationMatrix(object.matrix)
+}
+
+export function ndcToScreen(x: number, y: number, winW: number, winH: number) {
+  return new Vector2(((x + 1) * winW) / 2, -((y - 1) * winH) / 2)
 }

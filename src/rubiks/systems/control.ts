@@ -10,6 +10,7 @@ export class Control {
   private cube: Cube
   private camera: PerspectiveCamera
   private mouseDown = false
+  private mouseDownPos = new Vector2()
   private _square: SquareMesh | null = null
   private rotateSpeed = 0.06
   private raycaster = new Raycaster()
@@ -33,6 +34,9 @@ export class Control {
   private mouseDownHandler(e: MouseEvent) {
     this.mouseDown = true
     this._square = this.getSquareClicked(e)
+    if (this._square) {
+      this.mouseDownPos = new Vector2(e.clientX, e.clientY)
+    }
   }
   private mouseUpHandler() {
     if (this._square) {
@@ -48,6 +52,13 @@ export class Control {
       // 选中方块的时候，移动平面
       if (this._square) {
         // TODO rotate plane
+        this.cube.rotateOnePlane(
+          this.mouseDownPos,
+          new Vector2(e.clientX, e.clientY),
+          this.camera,
+          this._square,
+          { width: this.domElement.width, height: this.domElement.height }
+        )
       }
       // 当没有选中方块的时候，移动cube
       else {
