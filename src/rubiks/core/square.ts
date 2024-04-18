@@ -27,18 +27,20 @@ export const createSquare = (color: ColorRepresentation, cubeElement: CubeElemen
 
   const geometry = new ShapeGeometry(squareShape)
   const material = new MeshBasicMaterial({ color: cubeElement.color })
-  const mesh = new SquareMesh(geometry, material)
+  const mesh = new SquareMesh(geometry, material,cubeElement)
   mesh.scale.copy(scale)
 
   // 将方块移动到正确的位置
   mesh.position.copy(cubeElement.pos)
-  mesh.lookAt(mesh.position.clone().add(cubeElement.direction))
+  mesh.lookAt(mesh.position.clone().add(cubeElement.normal))
   return mesh
 }
 
 export class SquareMesh extends Mesh<ShapeGeometry, MeshBasicMaterial> {
-  public constructor(geometry: ShapeGeometry, material: MeshBasicMaterial) {
+  public element:CubeElement
+  public constructor(geometry: ShapeGeometry, material: MeshBasicMaterial,element:CubeElement) {
     super(geometry, material)
+    this.element = element
   }
 
   public clone(recursive?: boolean) {
