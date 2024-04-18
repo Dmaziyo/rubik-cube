@@ -1,7 +1,7 @@
 import { Camera, Group, Vector2, Vector3 } from 'three'
 import { SquareMesh, createSquare } from './square'
 import CubeData from './cubeData'
-import { ndcToScreen } from '../../utils/transform'
+import { getSquareScreenPos, ndcToScreen } from '../../utils/transform'
 import { CubeState } from './cubeState'
 
 export class Cube extends Group {
@@ -22,15 +22,6 @@ export class Cube extends Group {
     return this.children as SquareMesh[]
   }
 
-  private getSquareScreenPos(square: SquareMesh, camera: Camera, winSize: { width: number; height: number }) {
-    // 获取物体的世界坐标系位置，并转换成NDC坐标
-    let vect3 = new Vector3()
-    square.getWorldPosition(vect3)
-    this.position.project(camera)
-
-    // 转换成屏幕坐标
-    return ndcToScreen(vect3.x, vect3.y, winSize.width, winSize.height)
-  }
 
   public rotateOnePlane(
     mousePrePos: Vector2,
@@ -57,9 +48,8 @@ export class Cube extends Group {
         // 这个distance===1有点瑕疵，tag一下
         return s !== square && squareNormal.equals(s.getWorldDirection(normal)) && square.position.distanceTo(s.position) === 1
       })
-      // square1.material.color.set(Math.random() * 0xffffff)
-      // square2.material.color.set(Math.random() * 0xffffff)
     }
     // TODO 根据鼠标移动的方向与可能旋转的方向的夹角判断最终移动方向，然后计算旋转轴，旋转平面
+    const squarePosInScreen = getSquareScreenPos(square,camera,winSize)
   }
 }
