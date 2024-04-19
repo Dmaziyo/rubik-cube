@@ -17,12 +17,15 @@ export function ndcToScreen(x: number, y: number, winW: number, winH: number) {
 }
 
 // 将世界坐标转换成屏幕坐标
+export function worldToScreen(pos: Vector3, camera: Camera, winSize: { width: number; height: number }) {
+  // 转换成ndc坐标系
+  pos.project(camera)
+  // 转换成屏幕坐标
+  return ndcToScreen(pos.x, pos.y, winSize.width, winSize.height)
+}
 export function getSquareScreenPos(square: SquareMesh, camera: Camera, winSize: { width: number; height: number }) {
   // 获取物体的世界坐标系位置，并转换成NDC坐标
   let vect3 = new Vector3()
   square.getWorldPosition(vect3)
-  vect3.project(camera)
-
-  // 转换成屏幕坐标
-  return ndcToScreen(vect3.x, vect3.y, winSize.width, winSize.height)
+  return worldToScreen(vect3, camera, winSize)
 }

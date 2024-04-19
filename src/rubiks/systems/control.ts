@@ -40,10 +40,11 @@ export class Control {
   }
   private mouseUpHandler() {
     if (this._square) {
-      // 停止旋转，修改cube状态
-      // TODO 修正平面为90度
+      // TODO 修正旋转平面为90度
 
       this._square = null
+
+      this.renderer.render(this.scene, this.camera)
     }
     this.mouseDown = false
   }
@@ -52,13 +53,10 @@ export class Control {
       // 选中方块的时候，移动平面
       if (this._square) {
         // TODO rotate plane
-        this.cube.rotateOnePlane(
-          this.mouseDownPos,
-          new Vector2(e.clientX, e.clientY),
-          this.camera,
-          this._square,
-          { width: this.domElement.width, height: this.domElement.height }
-        )
+        this.cube.rotateOnePlane(this.mouseDownPos, new Vector2(e.clientX, e.clientY), this.camera, this._square, {
+          width: this.domElement.width,
+          height: this.domElement.height
+        })
       }
       // 当没有选中方块的时候，移动cube
       else {
@@ -69,8 +67,8 @@ export class Control {
         const rotateDir = moveVector.rotateAround(new Vector2(0, 0), Math.PI / 2).normalize()
 
         rotateAroundWorldAxis(this.cube, new Vector3(rotateDir.x, rotateDir.y), this.rotateSpeed)
-        this.renderer.render(this.scene, this.camera)
       }
+      this.renderer.render(this.scene, this.camera)
     }
   }
 

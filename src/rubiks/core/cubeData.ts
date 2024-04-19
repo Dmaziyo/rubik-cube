@@ -18,13 +18,14 @@ class CubeData {
   public elements: CubeElement[] = []
 
   public _size = 1
-  private cubeOrder: number
+  public cubeOrder: number
   private colors: CubeColor
   constructor(cubeOrder = 3, colors: CubeColor = ['white', 'red', 'orange', 'yellow', 'green', 'blue']) {
     this.cubeOrder = cubeOrder
     this.colors = colors
     this.initElements()
   }
+
   private initElements() {
 
     // 由左上角方块的中心点开始，根据阶数来遍历生成，参考：https://zhuanlan.zhihu.com/p/33580374
