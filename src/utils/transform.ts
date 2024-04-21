@@ -29,12 +29,9 @@ export function getSquareScreenPos(square: SquareMesh, camera: Camera, winSize: 
   square.getWorldPosition(vect3)
   return worldToScreen(vect3, camera, winSize)
 }
-export function calibration(num: number) {
-  let temp = Math.abs(num)
-  const roundAbsNum = Math.round(temp)
-  temp = roundAbsNum - temp < 0.2 ? roundAbsNum : roundAbsNum - 0.5
-  return num > 0 ? temp : -temp
+export function roundToNearest(num: number) {
+  return Math.round(num * 2) / 2
 }
-export function vector3Calibration(vect3: Vector3) { 
-  return new Vector3(calibration(vect3.x), calibration(vect3.y), calibration(vect3.z))
+export function vector3Calibration(vect3: Vector3) {
+  return new Vector3(roundToNearest(vect3.x), roundToNearest(vect3.y), roundToNearest(vect3.z))
 }

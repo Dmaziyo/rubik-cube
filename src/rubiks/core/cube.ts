@@ -115,7 +115,7 @@ export class Cube extends Group {
     const projLen = Math.cos(scrollDir.angleTo(rotateDir.scrollDir)) * scrollDir.length()
     const cubeSize = this.getCubeScreenSize(camera, winSize)
     // 因为scrollDir一直是从down到move计算的，是累加的，所以这个计算得出的是总共旋转角度
-    const angleRotated = ((projLen / cubeSize) * Math.PI) / 2
+    const angleRotated = (projLen / cubeSize) * Math.PI
     // 需要旋转的角度
 
     const rotateAngle = angleRotated - this.state.angleRotated
