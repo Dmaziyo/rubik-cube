@@ -8,7 +8,7 @@ export function throttle<T extends (...args: any[]) => void>(
             return;
         }
 
-        timer = setTimeout(() => {
+        timer = window.setTimeout(() => {
             fn(...args);
             timer = null;
         }, delay);
