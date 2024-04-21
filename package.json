@@ -7,7 +7,7 @@
   "scripts": {
     "tsc:watch": "tsc --watch",
     "start": "concurrently --kill-others --names tsc,web-dev-server \"npm run tsc:watch\" \"web-dev-server --config web-dev-server.config.js",
-    "build": "rimraf dist tsc && rollup -c rollup.config.js"
+    "build": "rimraf dist && tsc && rollup -c rollup.config.js"
   },
   "keywords": [],
   "author": "",
