@@ -3,18 +3,24 @@
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
+  "type": "module",
   "scripts": {
     "tsc:watch": "tsc --watch",
-    "start": "concurrently --kill-others --names tsc,web-dev-server \"npm run tsc:watch\" \"web-dev-server --config web-dev-server.config.js"
+    "start": "concurrently --kill-others --names tsc,web-dev-server \"npm run tsc:watch\" \"web-dev-server --config web-dev-server.config.js",
+    "build": "rimraf dist && rollup -c rollup.config.js"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "devDependencies": {
+    "@open-wc/building-rollup": "^3.0.2",
     "@types/three": "^0.163.0",
     "@web/dev-server": "^0.4.3",
     "concurrently": "^8.2.2",
+    "deepmerge": "^4.3.1",
+    "es-dev-server": "^2.1.0",
     "rimraf": "^5.0.5",
+    "rollup": "^3.21.0",
     "typescript": "^5.4.3"
   },
   "dependencies": {
