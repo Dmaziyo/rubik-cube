@@ -25,5 +25,6 @@ export class CubeState {
     this.rotateAxisLocal = null
     this.rotateDir = null
     this.rotateSquares = []
+    this.angleRotated = 0
   }
 }

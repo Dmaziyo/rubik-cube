@@ -29,3 +29,12 @@ export function getSquareScreenPos(square: SquareMesh, camera: Camera, winSize: 
   square.getWorldPosition(vect3)
   return worldToScreen(vect3, camera, winSize)
 }
+export function calibration(num: number) {
+  let temp = Math.abs(num)
+  const roundAbsNum = Math.round(temp)
+  temp = roundAbsNum - temp < 0.2 ? roundAbsNum : roundAbsNum - 0.5
+  return num > 0 ? temp : -temp
+}
+export function vector3Calibration(vect3: Vector3) { 
+  return new Vector3(calibration(vect3.x), calibration(vect3.y), calibration(vect3.z))
+}

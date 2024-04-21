@@ -29,7 +29,7 @@ export class Control {
   private init() {
     this.domElement.addEventListener('mousedown', this.mouseDownHandler.bind(this))
     this.domElement.addEventListener('mouseup', this.mouseUpHandler.bind(this))
-    this.domElement.addEventListener('mousemove', throttle(this.mouseMoveHandler.bind(this), 0.02))
+    this.domElement.addEventListener('mousemove', throttle(this.mouseMoveHandler.bind(this), 0.01))
   }
   private mouseDownHandler(e: MouseEvent) {
     this.mouseDown = true
@@ -40,10 +40,8 @@ export class Control {
   }
   private mouseUpHandler() {
     if (this._square) {
-      // TODO 修正旋转平面为90度
-
+      this.cube.afterRotate()
       this._square = null
-
       this.renderer.render(this.scene, this.camera)
     }
     this.mouseDown = false
@@ -52,7 +50,6 @@ export class Control {
     if (this.mouseDown) {
       // 选中方块的时候，移动平面
       if (this._square) {
-        // TODO rotate plane
         this.cube.rotateOnePlane(this.mouseDownPos, new Vector2(e.clientX, e.clientY), this.camera, this._square, {
           width: this.domElement.width,
           height: this.domElement.height

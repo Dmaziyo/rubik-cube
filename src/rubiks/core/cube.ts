@@ -1,7 +1,7 @@
-import { Camera, Group, Matrix4, Vector2, Vector3 } from 'three'
+import { Camera, Group, MathUtils, Matrix4, Vector2, Vector3 } from 'three'
 import { SquareMesh, createSquare } from './square'
 import CubeData from './cubeData'
-import { getSquareScreenPos, worldToScreen } from '../../utils/transform'
+import { getSquareScreenPos, vector3Calibration, worldToScreen } from '../../utils/transform'
 import { CubeState, RotateDirection } from './cubeState'
 
 // 获取方块中心向法向量的反方向收缩一半长度的位置
@@ -51,7 +51,7 @@ export class Cube extends Group {
       // 获取当前方块垂直和水平方向相邻的方块
       const [square1, square2] = this.squares.filter(s => {
         // 这个distance===1有点瑕疵，tag一下
-        return s !== controlSquare && squareNormal.equals(s.element.normal) && controlSquare.position.distanceTo(s.position) === 1
+        return s !== controlSquare && squareNormal.equals(s.element.normal) && controlSquare.element.pos.distanceTo(s.element.pos) === 1
       })
       const squarePosInScreen = getSquareScreenPos(controlSquare, camera, winSize)
       const square1PosInScreen = getSquareScreenPos(square1, camera, winSize)
@@ -91,7 +91,7 @@ export class Cube extends Group {
         }
       }
       // 旋转轴：通过叉积计算同时垂直于法向量和旋转向量的向量
-      const rotateDirLocal = rotateDir.endSquare.position.clone().sub(rotateDir.startSquare.position).normalize() //在local space中旋转的方向
+      const rotateDirLocal = rotateDir.endSquare.element.pos.clone().sub(rotateDir.startSquare.element.pos).normalize() //在local space中旋转的方向
       // 注意不能直接cross，会改变原有数据
       const rotateAxisLocal = squareNormal.clone().cross(rotateDirLocal)
 
@@ -124,6 +124,7 @@ export class Cube extends Group {
     // 使用transform 矩阵来旋转方块
     const rotateMat = new Matrix4().makeRotationAxis(rotateAxisLocal, rotateAngle)
 
+    // 相对于local space的旋转轴进行旋转
     rotateSquares.forEach(square => {
       square.applyMatrix4(rotateMat)
       square.updateMatrix()
@@ -137,4 +138,48 @@ export class Cube extends Group {
     const rightScreenPos = worldToScreen(new Vector3(localWidth, 0, 0), camera, winSize).length()
     return Math.abs(leftScreenPos - rightScreenPos)
   }
+  // 将平面旋转调整至90°的倍数，并且修改squareElement的数据，因为要pos来获取innerPos，normal来获取平面方块
+  public afterRotate() {
+    let angleRotated = this.state.angleRotated
+    // 将已经旋转的角度%90°计算超出的度数
+    const rotateSquares = this.state.rotateSquares
+
+    const exceedAnglePI = Math.abs(angleRotated) % (Math.PI * 0.5)
+
+    let needRotateAngle = exceedAnglePI > Math.PI * 0.25 ? Math.PI * 0.5 - exceedAnglePI : -exceedAnglePI
+    needRotateAngle = angleRotated > 0 ? needRotateAngle : -needRotateAngle
+    // 调整位置
+    const rotateMat = new Matrix4().makeRotationAxis(this.state.rotateAxisLocal!, needRotateAngle)
+    rotateSquares.forEach(square => {
+      square.applyMatrix4(rotateMat)
+      square.updateMatrix()
+    })
+
+    angleRotated += needRotateAngle
+
+    // 因为弧度有精度，所以直接使用角度
+    if (MathUtils.radToDeg(angleRotated) % 360 !== 0) {
+      const rotateMat = new Matrix4().makeRotationAxis(this.state.rotateAxisLocal!, angleRotated)
+      rotateSquares.forEach(square => {
+        const normal = square.element.normal.clone()
+        const pos = square.element.pos.clone()
+        square.element.normal = vector3Calibration(normal.applyMatrix4(rotateMat))
+        // 以pos为基准是因为pos没有在旋转的时候发生变更，而position在旋转的时候数字变成了浮点数，偏差较大
+        square.element.pos = vector3Calibration(pos.applyMatrix4(rotateMat))
+        //微调位置，因为旋转的时候radian不是整数，所以会形变
+        square.position.copy(square.element.pos)
+        square.updateMatrix()
+      })
+    }
+
+    console.log(
+      this.squares.map(square => {
+        return square.position.toArray()
+      })
+    )
+
+    this.state.resetSate()
+  }
 }
+
+// 进行精度校准，0.9->1  0.1->0 0.53->0.5
