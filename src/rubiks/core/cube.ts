@@ -157,20 +157,19 @@ export class Cube extends Group {
 
     angleRotated += needRotateAngle
 
-    // 因为弧度有精度，所以直接使用角度
-    if (MathUtils.radToDeg(angleRotated) % 360 !== 0) {
-      const rotateMat = new Matrix4().makeRotationAxis(this.state.rotateAxisLocal!, angleRotated)
-      rotateSquares.forEach(square => {
-        const normal = square.element.normal.clone()
-        const pos = square.element.pos.clone()
-        square.element.normal = vector3Calibration(normal.applyMatrix4(rotateMat))
-        // 以pos为基准是因为pos没有在旋转的时候发生变更，而position在旋转的时候数字变成了浮点数，偏差较大
-        square.element.pos = vector3Calibration(pos.applyMatrix4(rotateMat))
-        //微调位置，因为旋转的时候radian不是整数，所以会形变
-        square.position.copy(square.element.pos)
-        square.updateMatrix()
-      })
-    }
+    // 每次旋转完都要更新，因为每次旋转完后都会产生小数点的偏差
+    rotateSquares.forEach(square => {
+      const normal = square.element.normal.clone()
+      const pos = square.element.pos.clone()
+      square.element.normal = vector3Calibration(
+        normal.applyMatrix4(new Matrix4().makeRotationAxis(this.state.rotateAxisLocal!, angleRotated))
+      )
+      // 以pos为基准是因为pos没有在旋转的时候发生变更，而position在旋转的时候数字变成了浮点数，偏差较大
+      square.element.pos = vector3Calibration(pos.applyMatrix4(new Matrix4().makeRotationAxis(this.state.rotateAxisLocal!, angleRotated)))
+      //微调位置，因为旋转的时候radian不是整数，所以会形变
+      square.position.copy(square.element.pos)
+      square.updateMatrix()
+    })
 
     console.log(
       this.squares.map(square => {
