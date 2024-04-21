@@ -171,14 +171,8 @@ export class Cube extends Group {
       square.updateMatrix()
     })
 
-    console.log(
-      this.squares.map(square => {
-        return square.position.toArray()
-      })
-    )
 
     this.state.resetSate()
   }
 }
 
-// 进行精度校准，0.9->1  0.1->0 0.53->0.5

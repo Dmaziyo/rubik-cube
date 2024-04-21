@@ -29,6 +29,8 @@ export function getSquareScreenPos(square: SquareMesh, camera: Camera, winSize: 
   square.getWorldPosition(vect3)
   return worldToScreen(vect3, camera, winSize)
 }
+
+// 进行精度校准，0.9->1  0.1->0 0.53->0.5 1.49->1.5
 export function roundToNearest(num: number) {
   return Math.round(num * 2) / 2
 }
