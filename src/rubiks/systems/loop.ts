@@ -1,4 +1,5 @@
 import { Clock, PerspectiveCamera, Scene, WebGLRenderer } from 'three'
+import TWEEN from '@tweenjs/tween.js'
 const clock = new Clock()
 export class Loop {
   public updatables: any[]
@@ -17,6 +18,7 @@ export class Loop {
   start() {
     this.renderer.setAnimationLoop(() => {
       this.tick()
+      TWEEN.update()
       this.renderer.render(this.scene,this.camera)
     })
   }

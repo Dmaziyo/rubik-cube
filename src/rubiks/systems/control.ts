@@ -41,6 +41,7 @@ export class Control {
   private mouseUpHandler() {
     if (this._square) {
       this.cube.afterRotate()
+      this.shuffle()
       this._square = null
       this.renderer.render(this.scene, this.camera)
     }
@@ -83,5 +84,12 @@ export class Control {
     }
 
     return null
+  }
+
+  public shuffle() {
+    this.cube.shuffle(this.camera, {
+      width: this.domElement.width,
+      height: this.domElement.height
+    })
   }
 }

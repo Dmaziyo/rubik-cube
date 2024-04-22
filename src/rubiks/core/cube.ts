@@ -1,8 +1,9 @@
-import { Camera, Group, MathUtils, Matrix4, Vector2, Vector3 } from 'three'
+import { Camera, Group, MathUtils, Matrix4, Vector2, Vector3, WebGLRenderer } from 'three'
 import { SquareMesh, createSquare } from './square'
 import CubeData from './cubeData'
 import { getSquareScreenPos, vector3Calibration, worldToScreen } from '../../utils/transform'
 import { CubeState, RotateDirection } from './cubeState'
+import TWEEN from '@tweenjs/tween.js'
 
 // 获取方块中心向法向量的反方向收缩一半长度的位置
 function getInnerPos(square: SquareMesh, squareSize: number) {
@@ -171,8 +172,109 @@ export class Cube extends Group {
       square.updateMatrix()
     })
 
-
     this.state.resetSate()
   }
-}
 
+  public async shuffle(camera: Camera, winSize: { width: number; height: number }) {
+    this.state.shuffing = true
+    const shuffleTimes = 15
+    for (let i = 0; i < shuffleTimes; i++) {
+      // 随机选取一个方块
+      const controlSquare = this.squares[Math.floor(Math.random() * this.squares.length)]
+
+      // 判断可能旋转的方向, 获取法向量
+      const squareNormal = controlSquare.element.normal
+
+      // 获取当前方块垂直和水平方向相邻的方块
+      const [square1, square2] = this.squares.filter(s => {
+        // 这个distance===1有点瑕疵，tag一下
+        return s !== controlSquare && squareNormal.equals(s.element.normal) && controlSquare.element.pos.distanceTo(s.element.pos) === 1
+      })
+      const squarePosInScreen = getSquareScreenPos(controlSquare, camera, winSize)
+      const square1PosInScreen = getSquareScreenPos(square1, camera, winSize)
+      const square2PosInScreen = getSquareScreenPos(square2, camera, winSize)
+
+      // 列出可能的方向
+      const rotateDirections: RotateDirection[] = [
+        {
+          scrollDir: square1PosInScreen.clone().sub(squarePosInScreen).normalize(),
+          startSquare: controlSquare,
+          endSquare: square1
+        },
+        {
+          scrollDir: square1PosInScreen.clone().sub(squarePosInScreen).negate().normalize(),
+          startSquare: square1,
+          endSquare: controlSquare
+        },
+
+        {
+          scrollDir: square2PosInScreen.clone().sub(squarePosInScreen).normalize(),
+          startSquare: controlSquare,
+          endSquare: square2
+        },
+        {
+          scrollDir: square2PosInScreen.clone().sub(squarePosInScreen).negate().normalize(),
+          startSquare: square2,
+          endSquare: controlSquare
+        }
+      ]
+
+      // 随机选取一个方向
+      const rotateDir = rotateDirections[Math.floor(Math.random() * rotateDirections.length)]
+      // 旋转轴：通过叉积计算同时垂直于法向量和旋转向量的向量
+      const rotateDirLocal = rotateDir.endSquare.element.pos.clone().sub(rotateDir.startSquare.element.pos).normalize() //在local space中旋转的方向
+      // 注意不能直接cross，会改变原有数据
+      const rotateAxisLocal = squareNormal.clone().cross(rotateDirLocal)
+
+      // 旋转方块：通过找controlSquare的innerPos到其他方块的innerPos组成的向量与旋转轴是垂直的
+      const controlInnerPos = getInnerPos(controlSquare, this.cubeData._size)
+      const rotateSquares = this.squares.filter(square => {
+        const tempInner = getInnerPos(square, this.cubeData._size)
+        const vect = tempInner.clone().sub(controlInnerPos)
+        return vect.dot(rotateAxisLocal) === 0
+      })
+
+      // 更新方块状态
+      this.state.setState(rotateAxisLocal, rotateDir, rotateSquares)
+
+      // 在-180~180之间随机
+      const angleRotated = Math.random() > 0.5 ? Math.PI * (Math.random() * 0.5 + 0.5) : -Math.PI * (Math.random() * 0.5 + 0.5)
+      // 需要旋转的角度
+      await this.rotateAnimation(rotateSquares, rotateAxisLocal, angleRotated)
+    }
+    this.state.shuffing = false
+  }
+  private rotateAnimation(rotateSquares: SquareMesh[], rotateAxisLocal: Vector3, rotateAngle: number) {
+    const current = { rad: 0 }
+    const end = { rad: rotateAngle }
+    const time = Math.abs(rotateAngle) * (500 / Math.PI)
+    const previous = { rad: current.rad }
+    return new Promise((resolve, reject) => {
+      try {
+        new TWEEN.Tween(current)
+          .to(end, time)
+          .easing(TWEEN.Easing.Quadratic.Out)
+          .onUpdate(() => {
+            // 使用transform 矩阵来旋转方块
+            const rotateMat = new Matrix4().makeRotationAxis(rotateAxisLocal, current.rad - previous.rad)
+            previous.rad = current.rad
+            // 相对于local space的旋转轴进行旋转
+            rotateSquares.forEach(square => {
+              square.applyMatrix4(rotateMat)
+              square.updateMatrix()
+            })
+          })
+          .onComplete(cur => {
+            // 更新旋转角度
+            this.state.angleRotated = rotateAngle
+            // 重置状态
+            this.afterRotate()
+            resolve(cur)
+          })
+          .start(undefined)
+      } catch (err) {
+        reject(err)
+      }
+    })
+  }
+}
