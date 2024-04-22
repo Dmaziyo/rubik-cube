@@ -9,6 +9,9 @@
     "start": "concurrently --kill-others --names tsc,web-dev-server \"npm run tsc:watch\" \"web-dev-server --config web-dev-server.config.js",
     "build": "rimraf dist && tsc && rollup -c rollup.config.js"
   },
+  "engines": {
+    "node": "18.17.0"
+  },
   "keywords": [],
   "author": "",
   "license": "ISC",
