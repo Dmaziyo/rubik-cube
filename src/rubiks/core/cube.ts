@@ -244,4 +244,15 @@ export class Cube extends Group {
     // 更新方块状态
     this.state.setState(rotateAxisLocal, rotateDir, rotateSquares)
   }
+
+  public restore() {
+    // 清除所有子元素
+    this.clear()
+    // 重新生成方块
+    this.cubeData = new CubeData(this.order)
+    this.cubeData.elements.forEach(el => {
+      const square = createSquare(el.color, el)
+      this.add(square)
+    })
+  }
 }

@@ -21,17 +21,19 @@ export class Rubik {
   private scene: Scene
   private renderer: WebGLRenderer
   private loop: Loop
+  private control: Control
+  private cube: Cube
 
   public constructor(container: Element) {
     this.camera = createCamera()
-    this.scene = createScene('black')
+    this.scene = createScene('gray')
     this.renderer = createRenderer()
-    const cube = new Cube(3)
-    this.scene.add(cube)
+    this.cube = new Cube(3)
+    this.scene.add(this.cube)
 
     // 实现动画效果以及摄像头控制
     this.loop = new Loop(this.camera, this.scene, this.renderer)
-    const controls = new Control(this.renderer, this.scene, cube, this.camera)
+    this.control = new Control(this.renderer, this.scene, this.cube, this.camera)
 
     container.append(this.renderer.domElement)
 
@@ -49,5 +51,11 @@ export class Rubik {
   }
   public stop() {
     this.loop.stop()
+  }
+  public shuffle() {
+    this.control.shuffle()
+  }
+  public restore() {
+    this.cube.restore()
   }
 }
