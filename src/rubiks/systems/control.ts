@@ -79,8 +79,12 @@ export class Control {
     // calculate objects intersecting the picking ray
     const intersects = this.raycaster.intersectObjects(this.scene.children)
 
+    // 可能会选中黑色子方块
     if (intersects.length > 0) {
-      return intersects[0].object as SquareMesh
+      if (intersects[0].object instanceof SquareMesh) {
+        return intersects[0].object
+      }
+      return intersects[0].object.parent as SquareMesh
     }
 
     return null

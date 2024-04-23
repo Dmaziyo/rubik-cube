@@ -1,9 +1,9 @@
-import { ColorRepresentation, Mesh, MeshBasicMaterial, Shape, ShapeGeometry, Vector2, Vector3 } from 'three'
+import { ColorRepresentation, DoubleSide, Mesh, MeshBasicMaterial, Shape, ShapeGeometry, Vector2, Vector3 } from 'three'
 import { CubeElement } from './cubeData'
 
 // 画一个小方块
 export const createSquare = (color: ColorRepresentation, cubeElement: CubeElement) => {
-  const scale=new Vector3(0.9,0.9,0.9)
+  const scale = new Vector3(0.9, 0.9, 0.9)
   const squareShape = new Shape()
   const x = 0,
     y = 0
@@ -27,8 +27,20 @@ export const createSquare = (color: ColorRepresentation, cubeElement: CubeElemen
 
   const geometry = new ShapeGeometry(squareShape)
   const material = new MeshBasicMaterial({ color: cubeElement.color })
-  const mesh = new SquareMesh(geometry, material,cubeElement)
+  const mesh = new SquareMesh(geometry, material, cubeElement)
+  // 添加黑色材质填补间隙
+  const material2 = new MeshBasicMaterial({
+    color: 'black',
+    side: DoubleSide
+  })
+
+  const plane = new Mesh(geometry, material2)
+  // 移动靠后一点，防止重叠
+  plane.position.set(0, 0, -0.1) 
+  // 盖住整个魔方
+  plane.scale.copy(new Vector3(1.1, 1.1, 1.1)) 
   mesh.scale.copy(scale)
+  mesh.add(plane)
 
   // 将方块移动到正确的位置
   mesh.position.copy(cubeElement.pos)
@@ -37,8 +49,8 @@ export const createSquare = (color: ColorRepresentation, cubeElement: CubeElemen
 }
 
 export class SquareMesh extends Mesh<ShapeGeometry, MeshBasicMaterial> {
-  public element:CubeElement
-  public constructor(geometry: ShapeGeometry, material: MeshBasicMaterial,element:CubeElement) {
+  public element: CubeElement
+  public constructor(geometry: ShapeGeometry, material: MeshBasicMaterial, element: CubeElement) {
     super(geometry, material)
     this.element = element
   }
