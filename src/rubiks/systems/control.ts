@@ -12,7 +12,7 @@ export class Control {
   private mouseDown = false
   private mouseDownPos = new Vector2()
   private _square: SquareMesh | null = null
-  private rotateSpeed = 0.06
+  private rotateSpeed = 0.1
   private raycaster = new Raycaster()
   private isShuffling = false
   private get domElement() {
@@ -30,7 +30,7 @@ export class Control {
   private init() {
     this.domElement.addEventListener('mousedown', this.mouseDownHandler.bind(this))
     this.domElement.addEventListener('mouseup', this.mouseUpHandler.bind(this))
-    this.domElement.addEventListener('mousemove', throttle(this.mouseMoveHandler.bind(this), 0.01))
+    this.domElement.addEventListener('mousemove', throttle(this.mouseMoveHandler.bind(this), 0))
   }
   private mouseDownHandler(e: MouseEvent) {
     this.mouseDown = true
@@ -42,16 +42,15 @@ export class Control {
   private mouseUpHandler() {
     if (this._square && !this.isShuffling) {
       this.cube.afterRotate()
-      this.shuffle()
       this._square = null
       this.renderer.render(this.scene, this.camera)
     }
     this.mouseDown = false
   }
   private mouseMoveHandler(e: MouseEvent) {
-    if (this.mouseDown && !this.isShuffling) {
+    if (this.mouseDown) {
       // 选中方块的时候，移动平面
-      if (this._square) {
+      if (this._square && !this.isShuffling) {
         this.cube.rotateOnePlane(this.mouseDownPos, new Vector2(e.clientX, e.clientY), this.camera, this._square, {
           width: this.domElement.width,
           height: this.domElement.height
