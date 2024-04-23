@@ -10,7 +10,7 @@
     "build": "rimraf dist && tsc && rollup -c rollup.config.js"
   },
   "engines": {
-    "node": "18.17.0"
+    "node": ">=18"
   },
   "keywords": [],
   "author": "",
