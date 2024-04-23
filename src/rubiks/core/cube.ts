@@ -25,12 +25,49 @@ export class Cube extends Group {
     this.state = new CubeState()
   }
 
+  // 将cube的大小转换成屏幕大小
+  private getCubeScreenSize(camera: Camera, winSize: { width: number; height: number }) {
+    const localWidth = this.order * this.cubeData._size
+    const leftScreenPos = worldToScreen(new Vector3(-localWidth, 0, 0), camera, winSize).length()
+    const rightScreenPos = worldToScreen(new Vector3(localWidth, 0, 0), camera, winSize).length()
+    return Math.abs(leftScreenPos - rightScreenPos)
+  }
+
   public get squares() {
     return this.children as SquareMesh[]
   }
 
   public get order() {
     return this.cubeData.cubeOrder
+  }
+
+  public restore() {
+    // 清除所有子元素
+    this.clear()
+    // 重新生成方块
+    this.cubeData = new CubeData(this.order)
+    this.cubeData.elements.forEach(el => {
+      const square = createSquare(el.color, el)
+      this.add(square)
+    })
+  }
+
+  public async shuffle(camera: Camera, winSize: { width: number; height: number }) {
+    const shuffleTimes = 15
+    for (let i = 0; i < shuffleTimes; i++) {
+      // 随机选取一个方块
+      const controlSquare = this.squares[Math.floor(Math.random() * this.squares.length)]
+      this.setCubeState(true, controlSquare, camera, winSize, new Vector2(0, 0))
+
+      // 在-180~180之间随机
+      const rotateAngle = Math.random() > 0.5 ? Math.PI * (Math.random() * 0.5 + 0.5) : -Math.PI * (Math.random() * 0.5 + 0.5)
+
+      const rotateAxisLocal = this.state.rotateAxisLocal!
+      const rotateSquares = this.state.rotateSquares
+
+      // 进行旋转动画
+      await this.rotateAnimation(rotateSquares, rotateAxisLocal, rotateAngle)
+    }
   }
 
   public rotateOnePlane(
@@ -74,13 +111,6 @@ export class Cube extends Group {
     })
   }
 
-  // 将cube的大小转换成屏幕大小
-  private getCubeScreenSize(camera: Camera, winSize: { width: number; height: number }) {
-    const localWidth = this.order * this.cubeData._size
-    const leftScreenPos = worldToScreen(new Vector3(-localWidth, 0, 0), camera, winSize).length()
-    const rightScreenPos = worldToScreen(new Vector3(localWidth, 0, 0), camera, winSize).length()
-    return Math.abs(leftScreenPos - rightScreenPos)
-  }
   // 将平面旋转调整至90°的倍数，并且修改squareElement的数据，因为要pos来获取innerPos，normal来获取平面方块
   public afterRotate() {
     let angleRotated = this.state.angleRotated
@@ -117,23 +147,6 @@ export class Cube extends Group {
     this.state.resetSate()
   }
 
-  public async shuffle(camera: Camera, winSize: { width: number; height: number }) {
-    const shuffleTimes = 15
-    for (let i = 0; i < shuffleTimes; i++) {
-      // 随机选取一个方块
-      const controlSquare = this.squares[Math.floor(Math.random() * this.squares.length)]
-      this.setCubeState(true, controlSquare, camera, winSize, new Vector2(0, 0))
-
-      // 在-180~180之间随机
-      const rotateAngle = Math.random() > 0.5 ? Math.PI * (Math.random() * 0.5 + 0.5) : -Math.PI * (Math.random() * 0.5 + 0.5)
-
-      const rotateAxisLocal = this.state.rotateAxisLocal!
-      const rotateSquares = this.state.rotateSquares
-
-      // 进行旋转动画
-      await this.rotateAnimation(rotateSquares, rotateAxisLocal, rotateAngle)
-    }
-  }
   private rotateAnimation(rotateSquares: SquareMesh[], rotateAxisLocal: Vector3, rotateAngle: number) {
     const current = { rad: 0 }
     const end = { rad: rotateAngle }
@@ -243,16 +256,5 @@ export class Cube extends Group {
 
     // 更新方块状态
     this.state.setState(rotateAxisLocal, rotateDir, rotateSquares)
-  }
-
-  public restore() {
-    // 清除所有子元素
-    this.clear()
-    // 重新生成方块
-    this.cubeData = new CubeData(this.order)
-    this.cubeData.elements.forEach(el => {
-      const square = createSquare(el.color, el)
-      this.add(square)
-    })
   }
 }
