@@ -32,6 +32,35 @@ export class Control {
     this.domElement.addEventListener('mouseup', this.mouseUpHandler.bind(this))
     this.domElement.addEventListener('mousemove', throttle(this.mouseMoveHandler.bind(this), 0))
   }
+  public async shuffle() {
+    this.isShuffling = true
+    await this.cube.shuffle(this.camera, {
+      width: this.domElement.width,
+      height: this.domElement.height
+    })
+
+    this.isShuffling = false
+  }
+
+  private getSquareClicked(e: MouseEvent) {
+    // 将其转换为NDC坐标,因为当前坐标是以左上角为(0,0)开头的,要转换为中心为(0,0)并且左右范围为[-1,1]的坐标
+    const x = (e.clientX / window.innerWidth) * 2 - 1
+    const y = -(e.clientY / window.innerHeight) * 2 + 1
+    this.raycaster.setFromCamera(new Vector2(x, y), this.camera)
+
+    // calculate objects intersecting the picking ray
+    const intersects = this.raycaster.intersectObjects(this.scene.children)
+
+    // 可能会选中黑色子方块
+    if (intersects.length > 0) {
+      if (intersects[0].object instanceof SquareMesh) {
+        return intersects[0].object
+      }
+      return intersects[0].object.parent as SquareMesh
+    }
+
+    return null
+  }
   private mouseDownHandler(e: MouseEvent) {
     this.mouseDown = true
     this._square = this.getSquareClicked(e)
@@ -68,35 +97,5 @@ export class Control {
       }
       this.renderer.render(this.scene, this.camera)
     }
-  }
-
-  private getSquareClicked(e: MouseEvent) {
-    // 将其转换为NDC坐标,因为当前坐标是以左上角为(0,0)开头的,要转换为中心为(0,0)并且左右范围为[-1,1]的坐标
-    const x = (e.clientX / window.innerWidth) * 2 - 1
-    const y = -(e.clientY / window.innerHeight) * 2 + 1
-    this.raycaster.setFromCamera(new Vector2(x, y), this.camera)
-
-    // calculate objects intersecting the picking ray
-    const intersects = this.raycaster.intersectObjects(this.scene.children)
-
-    // 可能会选中黑色子方块
-    if (intersects.length > 0) {
-      if (intersects[0].object instanceof SquareMesh) {
-        return intersects[0].object
-      }
-      return intersects[0].object.parent as SquareMesh
-    }
-
-    return null
-  }
-
-  public async shuffle() {
-    this.isShuffling = true
-    await this.cube.shuffle(this.camera, {
-      width: this.domElement.width,
-      height: this.domElement.height
-    })
-
-    this.isShuffling = false
   }
 }
