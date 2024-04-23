@@ -12,7 +12,6 @@ export class CubeState {
   rotateSquares: SquareMesh[] = []
   rotateDir: RotateDirection | null = null
   angleRotated: number = 0
-  shuffing: boolean = false
   constructor() {}
 
   public setState(rotateAxisLocal: Vector3, rotateDir: RotateDirection, rotateSquares: SquareMesh[]) {
@@ -27,6 +26,5 @@ export class CubeState {
     this.rotateDir = null
     this.rotateSquares = []
     this.angleRotated = 0
-    this.shuffing = false
   }
 }

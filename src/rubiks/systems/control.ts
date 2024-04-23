@@ -14,6 +14,7 @@ export class Control {
   private _square: SquareMesh | null = null
   private rotateSpeed = 0.06
   private raycaster = new Raycaster()
+  private isShuffling = false
   private get domElement() {
     return this.renderer.domElement
   }
@@ -39,7 +40,7 @@ export class Control {
     }
   }
   private mouseUpHandler() {
-    if (this._square) {
+    if (this._square && !this.isShuffling) {
       this.cube.afterRotate()
       this.shuffle()
       this._square = null
@@ -48,7 +49,7 @@ export class Control {
     this.mouseDown = false
   }
   private mouseMoveHandler(e: MouseEvent) {
-    if (this.mouseDown) {
+    if (this.mouseDown && !this.isShuffling) {
       // 选中方块的时候，移动平面
       if (this._square) {
         this.cube.rotateOnePlane(this.mouseDownPos, new Vector2(e.clientX, e.clientY), this.camera, this._square, {
@@ -86,10 +87,13 @@ export class Control {
     return null
   }
 
-  public shuffle() {
-    this.cube.shuffle(this.camera, {
+  public async shuffle() {
+    this.isShuffling = true
+    await this.cube.shuffle(this.camera, {
       width: this.domElement.width,
       height: this.domElement.height
     })
+
+    this.isShuffling = false
   }
 }

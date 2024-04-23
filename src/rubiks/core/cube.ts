@@ -118,12 +118,11 @@ export class Cube extends Group {
   }
 
   public async shuffle(camera: Camera, winSize: { width: number; height: number }) {
-    this.state.shuffing = true
     const shuffleTimes = 15
     for (let i = 0; i < shuffleTimes; i++) {
       // 随机选取一个方块
       const controlSquare = this.squares[Math.floor(Math.random() * this.squares.length)]
-      this.setCubeState(this.state.shuffing, controlSquare, camera, winSize, new Vector2(0, 0))
+      this.setCubeState(true, controlSquare, camera, winSize, new Vector2(0, 0))
 
       // 在-180~180之间随机
       const rotateAngle = Math.random() > 0.5 ? Math.PI * (Math.random() * 0.5 + 0.5) : -Math.PI * (Math.random() * 0.5 + 0.5)
@@ -134,7 +133,6 @@ export class Cube extends Group {
       // 进行旋转动画
       await this.rotateAnimation(rotateSquares, rotateAxisLocal, rotateAngle)
     }
-    this.state.shuffing = false
   }
   private rotateAnimation(rotateSquares: SquareMesh[], rotateAxisLocal: Vector3, rotateAngle: number) {
     const current = { rad: 0 }
