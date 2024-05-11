@@ -1,14 +1,20 @@
 import { Rubik } from './rubiks'
-const container = document.getElementById('container')
+const container = document.getElementsByClassName('container')[0]
+const rubikWrapper = document.getElementById('rubik-wrapper')
 const shuffleBtn = document.getElementById('shuffle')
 const restoreBtn = document.getElementById('restore')
 
-if (container) {
-  const rubiks = new Rubik(container)
+if (rubikWrapper) {
+  const rubiks = new Rubik(rubikWrapper)
   shuffleBtn?.addEventListener('click', () => {
     rubiks.shuffle()
   })
   restoreBtn?.addEventListener('click', () => {
     rubiks.restore()
   })
+
+  window.addEventListener('resize', () => {
+    rubiks.restore()
+  })
+  container.classList.add('visible')
 }
